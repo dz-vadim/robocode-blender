@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blender: більше інструментів</title>
+<style>
+:root{--bg:#f7f6f2;--fg:#1f2227;--muted:#5b616c;--card:#fff;--line:#e2e0d8;--accent:#6b2fa3;--accent2:#3d8b4f;--warn:#a15c00;--code:#efede6;--yel:#ffc428}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17191d;--fg:#e9e8e4;--muted:#a3a8b2;--card:#1f2228;--line:#31353d;--accent:#b88ae6;--accent2:#7fd18f;--warn:#ffc266;--code:#262a31}}
+:root[data-theme="dark"]{--bg:#17191d;--fg:#e9e8e4;--muted:#a3a8b2;--card:#1f2228;--line:#31353d;--accent:#b88ae6;--accent2:#7fd18f;--warn:#ffc266;--code:#262a31}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:1040px;margin:0 auto;padding:32px 16px 72px}
+h1{font-size:1.9rem;line-height:1.25;margin:0 0 6px}
+h2{font-size:1.3rem;margin:44px 0 10px;display:flex;gap:10px;align-items:baseline}
+h2 .n{flex:none;display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--accent);color:#fff;font-size:1rem}
+p{margin:8px 0}
+.sub{color:var(--muted);margin:0 0 22px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:14px 0}
+.tip{border-left:4px solid var(--accent2)}
+.warn{border-left:4px solid var(--warn)}
+figure{margin:14px 0}
+figure img{width:100%;height:auto;border-radius:8px;border:1px solid var(--line);display:block}
+figcaption{color:var(--muted);font-size:.9rem;margin-top:6px}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:720px){.pair{grid-template-columns:1fr}}
+code,kbd{background:var(--code);padding:1px 6px;border-radius:4px;font-size:.88em;overflow-wrap:anywhere}
+kbd{border:1px solid var(--line);border-bottom-width:3px;font-weight:600;white-space:nowrap}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.95rem}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:600}
+.wrap{overflow-x:auto}
+ol li,ul li{margin:4px 0}
+details{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 16px;margin-top:40px}
+summary{cursor:pointer;font-weight:600}
+footer{margin-top:40px;color:var(--muted);font-size:.85rem}
+
+/* вкладки завдань */
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 0}
+.tabs button{display:flex;gap:10px;align-items:center;text-align:left;background:var(--card);color:var(--fg);border:2px solid var(--line);border-radius:10px;padding:6px;font:inherit;cursor:pointer;min-width:0}
+.tabs button img{width:64px;height:64px;border-radius:6px;flex:none}
+.tabs button span{min-width:0;font-weight:600;line-height:1.3}
+.tabs button.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent) inset}
+.lvl{display:block;font-size:.75rem;letter-spacing:.06em;color:#fff;background:#6b2fa3;border-radius:4px;padding:1px 6px;width:max-content;margin-bottom:3px}
+.lvl.easy{background:#3d8b4f}.lvl.medium{background:#b07a00}.lvl.hard{background:#b03a3a}
+@media (max-width:620px){.tabs button{flex-direction:column;text-align:center}.tabs button img{width:56px;height:56px}.lvl{margin:0 auto 3px}}
+.player[hidden]{display:none}
+.tabs.four{grid-template-columns:repeat(4,1fr)}
+@media (max-width:620px){.tabs.four{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:620px){.player .done{padding:8px}.player .done button{font-size:.9rem;padding:6px 12px}}
+
+/* програвач */
+.player{background:#101217;border-radius:12px;overflow:hidden;margin:14px 0;border:1px solid #2a2e37;color:#e9e8e4}
+.player .stage{position:relative;background:#000}
+.player video{display:block;width:100%;height:auto;aspect-ratio:16/10;background:#000;cursor:pointer}
+.player .done{position:absolute;right:0;bottom:0;display:none;padding:14px}
+.player.paused-end .done{display:flex}
+.player .done button{font-size:1.05rem;padding:10px 22px}
+.player .bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 12px;border-top:1px solid #2a2e37}
+.player button{background:#262b35;color:#fff;border:1px solid #3a404c;border-radius:8px;padding:7px 12px;font:inherit;font-size:.95rem;cursor:pointer}
+.player button:hover{background:#323846}
+.player button.main{background:var(--yel);color:#1d1600;border-color:var(--yel);font-weight:700}
+.player .now{flex:1 1 260px;font-weight:600;min-width:0}
+.player .now small{display:block;color:#a3a8b2;font-weight:400}
+.player label{font-size:.9rem;color:#c8ccd4;display:flex;gap:6px;align-items:center}
+.player select{background:#262b35;color:#fff;border:1px solid #3a404c;border-radius:6px;padding:4px}
+.player input[type=range]{width:100%;accent-color:var(--yel);margin:0}
+.player .seek{padding:0 12px 6px}
+.player ol.steps{margin:0;padding:6px 12px 12px 12px;list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:6px;counter-reset:s}
+.player ol.steps li{margin:0;counter-increment:s;padding:6px 10px 6px 38px;position:relative;border-radius:8px;background:#1a1d24;cursor:pointer;font-size:.88rem;line-height:1.35}
+.player ol.steps li::before{content:counter(s);position:absolute;left:8px;top:6px;width:22px;height:22px;border-radius:50%;background:#3a404c;display:grid;place-items:center;font-size:.8rem;font-weight:700}
+.player ol.steps li.cur{background:#3a2f0c;outline:2px solid var(--yel)}
+.player ol.steps li.cur::before{background:var(--yel);color:#1d1600}
+.player ol.steps li.seen::before{background:#3d8b4f}
+.player ol.steps li b{color:var(--yel);font-weight:600;display:block;font-size:.82rem}
+</style>
+</head>
+<body>
+<main>
+<!--nav--><style>.lnav{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin:0 0 18px;font-size:.92rem}.lnav a{color:var(--fg);text-decoration:none;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 12px}.lnav a:hover{border-color:var(--accent)}.lnav .nums{display:flex;gap:6px}.lnav .nums a,.lnav .nums b{min-width:36px;text-align:center;padding:6px 10px}.lnav .nums b{background:var(--accent);color:#fff;border-radius:8px}.lnav .side{flex:1 1 200px}.lnav .side.r{text-align:right}.lnav.bottom{margin:40px 0 0}@media (max-width:620px){.lnav .side{flex-basis:100%;text-align:center}.lnav .nums{margin:0 auto}}</style><nav class="lnav" aria-label="Уроки Blender"><span class="side"><a href="../blender-04/index.html" title="перші кроки">← Урок 4: перші кроки</a></span><span class="nums"><a href="../blender-04/index.html" title="перші кроки">4</a><b>5</b><a href="../blender-06/index.html" title="модифікатори і референси">6</a></span><span class="side r"><a href="../blender-06/index.html" title="модифікатори і референси">Урок 6: модифікатори і референси →</a></span></nav><!--/nav-->
+<h1>Blender: більше інструментів</h1>
+<p class="sub">Unity 3D · урок 5 «Більше інструментів. Побудова деталізованої моделі» · Blender 5.2</p>
+
+<div class="box tip"><b>Як дивитися відео.</b> Відео грає без зупинок; <kbd>Пробіл</kbd> — пауза, <kbd>←</kbd> / <kbd>→</kbd> — крок назад / вперед, швидкість 0.5–1.5×. Хочеш, щоб воно чекало на тебе після кожного кроку, — постав галочку <b>«зупинятися після кроку»</b>.
+<kbd>←</kbd> / <kbd>→</kbd> — попередній / наступний крок, <kbd>R</kbd> — ще раз. Жовтим унизу — клавіші, миша показує, яку кнопку тиснути.</div>
+
+<h2><span class="n">1</span>Нові інструменти</h2>
+<div class="player" data-name="tools5"></div>
+<div class="wrap"><table>
+<tr><th>Клавіша</th><th>Інструмент</th><th>Що робить</th></tr>
+<tr><td><kbd>Shift</kbd>+<kbd>ПКМ</kbd> · <kbd>Shift</kbd>+<kbd>S</kbd></td><td>3D-курсор</td><td>ставить курсор; нові фігури з'являються біля нього. <kbd>Shift</kbd>+<kbd>S</kbd> → <b>Cursor to World Origin</b> — назад у центр</td></tr>
+<tr><td><kbd>I</kbd></td><td>Inset</td><td>нова грань усередині виділеної; <kbd>I</kbd> ще раз — кожна грань окремо</td></tr>
+<tr><td><kbd>Ctrl</kbd>+<kbd>B</kbd></td><td>Bevel</td><td>скіс / заокруглення ребра; колесом миші — кількість сегментів</td></tr>
+<tr><td><kbd>Ctrl</kbd>+<kbd>R</kbd></td><td>Loop Cut</td><td>розріз-петля (знайомий з уроку 4)</td></tr>
+<tr><td><kbd>K</kbd></td><td>Knife</td><td>ніж: <kbd>ЛКМ</kbd> по точках, <kbd>Enter</kbd> — розрізати</td></tr>
+<tr><td><kbd>O</kbd></td><td>Proportional Editing</td><td>G / R / S тягнуть і сусідні вершини, плавно; колесо миші — радіус</td></tr>
+<tr><td><kbd>Alt</kbd>+<kbd>ЛКМ</kbd></td><td>Loop Select</td><td>виділити петлю по колу</td></tr>
+<tr><td><kbd>ПКМ</kbd> → Smooth Vertices</td><td>Smooth</td><td>згладжує гострі кути виділеного</td></tr>
+<tr><td><kbd>Shift</kbd>+<kbd>Tab</kbd></td><td>Snap (магніт)</td><td>рух рівними кроками по сітці; стрілка біля магніта — до чого прив'язувати</td></tr>
+<tr><td><kbd>Z</kbd></td><td>Shading</td><td>каркас / суцільний / матеріал / рендер (або 4 кульки праворуч угорі)</td></tr>
+</table></div>
+<div class="box tip"><b>Ще більше інструментів:</b> у кнопок панелі зліва з маленьким трикутником затисни <kbd>ЛКМ</kbd> — відкриються інструменти-«родичі» (Spin, Poly Build, Shear, Rip…). Спробуй їх!</div>
+
+<h2><span class="n">2</span>Застосовуємо вивчене</h2>
+<div class="tasks">
+  <div class="tabs four" role="tablist">
+    <button role="tab" data-t="mushroom" class="on"><img src="img/mushroom.jpg" alt=""><span><b class="lvl easy">1</b>Гриб</span></button>
+    <button role="tab" data-t="arch"><img src="img/arch.jpg" alt=""><span><b class="lvl easy">2</b>Арка</span></button>
+    <button role="tab" data-t="tree"><img src="img/tree.jpg" alt=""><span><b class="lvl medium">3</b>Дерево</span></button>
+    <button role="tab" data-t="man"><img src="img/man.jpg" alt=""><span><b class="lvl hard">4</b>Чоловічок</span></button>
+  </div>
+  <div class="player" data-name="mushroom"></div>
+  <div class="player" data-name="arch" hidden></div>
+  <div class="player" data-name="tree" hidden></div>
+  <div class="player" data-name="man" hidden></div>
+</div>
+<div class="box warn"><b>Proportional Editing тягне забагато чи замало</b> — під час <kbd>G</kbd> / <kbd>S</kbd> покрути колесо миші: коло впливу стане меншим або більшим. Не забудь вимкнути <kbd>O</kbd>, коли воно більше не потрібне.</div>
+<div class="box tip"><b>Арка:</b> який пам'ятник на референсі? (Тріумфальна арка, Париж.) <b>Дерево:</b> модель не мусить бути суцільною — <kbd>Shift</kbd>+<kbd>A</kbd> у режимі редагування додає фігуру в ту саму модель.</div>
+
+<h2><span class="n">3</span>Final boss: космічний корабель</h2>
+<p>Спершу спробуй сам за картинкою зі слайда. Застряг — дивись покрокове відео нижче.</p>
+<figure><img src="img/spaceship.jpg" alt="Корабель з презентації"><figcaption>Референс із презентації</figcaption></figure>
+<figure><img src="img/ship_p.jpg" alt="Готовий корабель" style="max-width:240px"><figcaption>Що вийде (як модель із матеріалів курсу)</figcaption></figure>
+<div class="box tip"><b>Покрокова інструкція з картинками</b> (можна роздрукувати): <a href="ship.html">ship.html</a> — 38 кроків з точними числами.</div>
+<p>Увесь корабель — одне відео (38 кроків). Увесь корабель — <b>одна модель</b>: усе витягуємо з корпусу (<kbd>E</kbd>, <kbd>I</kbd>, <kbd>K</kbd>), без окремих кубів. Обидва боки виділяй разом (<kbd>Shift</kbd>+<kbd>ЛКМ</kbd>) — Mirror ще не вчили.</p>
+<div class="player" data-name="ship_p"></div>
+</div>
+<div class="box tip"><b>Select Box</b> (рамка): затисни <kbd>ЛКМ</kbd> на порожньому місці і тягни — виділиться все всередині. З <kbd>Shift</kbd> — додати до виділення. Так швидше, ніж клацати 8 смужок по одній.</div>
+<div class="box">Збережи: <kbd>Ctrl</kbd>+<kbd>S</kbd> → <code>spaceship.blend</code>.</div>
+
+<details>
+<summary>Для вчителя: файли для презентації</summary>
+<p>Кожен крок окремим відео — <code>video/&lt;вправа&gt;-NN.mp4</code>. На відміну від GIF у презентації, відео в Google Slides можна зупиняти: завантаж на Диск → <b>Вставити → Відео → Google Диск</b>.</p>
+<p>Усі вправи підряд: <a href="video/lesson05-all.mp4">lesson05-all.mp4</a>. Цілі вправи: <a href="video/tools5.mp4">tools5</a> · <a href="video/mushroom.mp4">mushroom</a> · <a href="video/arch.mp4">arch</a> · <a href="video/tree.mp4">tree</a> · <a href="video/man.mp4">man</a> · <a href="video/ship_p.mp4">ship_p</a>.</p>
+<p>Кадри знято скриптом у Blender 5.2; клавіші й мишу намальовано в самому Blender. Джерела: <code>_work/b05/anim5.py</code>, <code>build_videos.py</code>.</p>
+</details>
+
+<footer>Robocode · Unity 3D · урок 5</footer>
+<!--nav--><nav class="lnav bottom" aria-label="Уроки Blender"><span class="side"><a href="../blender-04/index.html" title="перші кроки">← Урок 4: перші кроки</a></span><span class="nums"><a href="../blender-04/index.html" title="перші кроки">4</a><b>5</b><a href="../blender-06/index.html" title="модифікатори і референси">6</a></span><span class="side r"><a href="../blender-06/index.html" title="модифікатори і референси">Урок 6: модифікатори і референси →</a></span></nav><!--/nav-->
+</main>
+
+<script>
+const CH = {"tools5": {"label": "Нові інструменти", "steps": [{"t0": 0.0, "t1": 1.2, "title": "3D-курсор: Shift + ПКМ — поставити. Нові фігури з'являються біля нього", "keys": "Shift + ПКМ"}, {"t0": 1.2, "t1": 4.5, "title": "Shift + S → Cursor to World Origin — курсор назад у центр", "keys": "Shift + S   1"}, {"t0": 4.5, "t1": 12.0, "title": "I — Inset: нова грань усередині виділеної", "keys": "3   ЛКМ   I   0.3   Enter"}, {"t0": 12.0, "t1": 21.3, "title": "Ctrl + B — Bevel: скіс ребра; колесом миші — кількість сегментів", "keys": "2   ЛКМ   Ctrl + B   колесо миші"}, {"t0": 21.3, "t1": 24.6, "title": "K — Knife (ніж): ЛКМ по точках розрізу, потім Enter", "keys": "K   ЛКМ   ЛКМ   Enter"}, {"t0": 24.6, "t1": 29.4, "title": "O — Proportional Editing: G тягне й сусідні вершини; колесо миші — радіус", "keys": "O   G   Z   1.5   Enter"}, {"t0": 29.4, "t1": 33.0, "title": "Z — вигляд: каркас, суцільний, матеріал, рендер (кнопки праворуч угорі)", "keys": "Z"}, {"t0": 33.0, "t1": 38.4, "title": "Shift + Tab — прив'язка (магніт): G рухає об'єкт рівними кроками по сітці", "keys": "Shift + Tab   G"}]}, "mushroom": {"label": "Гриб: Proportional Editing", "steps": [{"t0": 0.0, "t1": 1.2, "title": "Shift + A → UV Sphere (Segments 32, Rings 16). Tab, A", "keys": "Tab   A"}, {"t0": 1.2, "t1": 5.7, "title": "Зроби довгу тонку ніжку", "keys": "S   Shift + Z   0.5   S   Z   1.6"}, {"t0": 5.7, "t1": 6.9, "title": "Numpad 1 — вид спереду. Рамкою ЛКМ — верхівку до 6-го ряду вершин", "keys": "1   Numpad 1   ЛКМ (рамка)"}, {"t0": 6.9, "t1": 10.2, "title": "O — Proportional Editing. Розшир капелюх; колесом миші — більше коло", "keys": "O   S   Shift + Z   3   Enter"}, {"t0": 10.2, "t1": 14.7, "title": "Alt + ЛКМ — петля по краю капелюха, G Z вниз", "keys": "Alt + ЛКМ   G   Z   -0.5   Enter"}, {"t0": 14.7, "t1": 19.2, "title": "ЛКМ по верхній вершині, G Z — купол стане круглішим (O ще ввімкнено)", "keys": "ЛКМ   G   Z   0.3   Enter"}, {"t0": 19.2, "t1": 23.7, "title": "Знизу ЛКМ по нижній вершині, S — ніжка ширша внизу", "keys": "ЛКМ   S   Shift + Z   1.6   Enter"}, {"t0": 23.7, "t1": 26.7, "title": "Tab, ПКМ → Shade Smooth — гладка поверхня", "keys": "Tab   ПКМ   Shade Smooth"}, {"t0": 26.7, "t1": 33.6, "title": "Tab — готово! Покрути вид, щоб оглянути", "keys": "Tab"}]}, "arch": {"label": "Арка: Bevel", "steps": [{"t0": 0.0, "t1": 6.6, "title": "Tab, A — плита: тонша й нижча", "keys": "Tab   A   S   Y   0.4   S   Z   0.5"}, {"t0": 6.6, "t1": 10.5, "title": "Ctrl + R уздовж: 2 розрізи, і розсунь їх", "keys": "Ctrl + R   колесо миші   S   X   1.35"}, {"t0": 10.5, "t1": 12.6, "title": "Знизу: 3, ЛКМ і Shift + ЛКМ — дві крайні грані", "keys": "3   ЛКМ   Shift + ЛКМ"}, {"t0": 12.6, "t1": 15.9, "title": "Видави ніжки арки вниз", "keys": "E   2   Enter"}, {"t0": 15.9, "t1": 18.0, "title": "2 — режим ребер. ЛКМ, Shift + ЛКМ — 2 ребра над проходом", "keys": "2   ЛКМ   Shift + ЛКМ"}, {"t0": 18.0, "t1": 21.3, "title": "Ctrl + B — заокругли: 0.4, колесом миші 6 сегментів", "keys": "Ctrl + B   0.4   колесо миші"}, {"t0": 21.3, "t1": 30.3, "title": "Карниз: 3, Shift + ЛКМ — верхні грані; E, ПКМ, S 1.12", "keys": "3   Shift + ЛКМ   E   ПКМ   S   1.12"}, {"t0": 30.3, "t1": 37.2, "title": "Tab — готово! Покрути вид, щоб оглянути", "keys": "Tab"}]}, "tree": {"label": "Дерево: Knife", "steps": [{"t0": 0.0, "t1": 2.7, "title": "Cylinder, Vertices = 10. Tab, Ctrl + R — розріз унизу стовбура", "keys": "Tab   Ctrl + R   ЛКМ   веди вниз"}, {"t0": 2.7, "t1": 9.6, "title": "Знизу ЛКМ по нижній грані. O, S 1.6 — корінь ширший", "keys": "ЛКМ   O   S   1.6   Enter"}, {"t0": 9.6, "t1": 13.8, "title": "Зверху ЛКМ по верхній грані, E 1 — стовбур вище (O вимкни)", "keys": "O   ЛКМ   E   1   Enter"}, {"t0": 13.8, "t1": 20.7, "title": "Alt + ЛКМ — петля посередині стовбура. O, S 0.85; колесом миші — зона на весь стовбур", "keys": "Alt + ЛКМ   O   S   0.85   Enter"}, {"t0": 20.7, "t1": 23.7, "title": "K — ніж: ЛКМ по вершині, ЛКМ по центру, ЛКМ по протилежній, Enter", "keys": "K   ЛКМ   ЛКМ   ЛКМ   Enter"}, {"t0": 23.7, "t1": 28.8, "title": "1, Shift + ЛКМ — 3 вершини розрізу. G Z 0.25 — гребінь, гілки розійдуться", "keys": "1   Shift + ЛКМ   G   Z   0.25"}, {"t0": 28.8, "t1": 39.6, "title": "3, ЛКМ по праву половинці. Тричі: E, S 0.8, R X 15", "keys": "E   0.5   S   0.8   R   X   15"}, {"t0": 39.6, "t1": 50.4, "title": "3, ЛКМ по ліву половинці. Тричі: E, S 0.8, R X -15", "keys": "E   0.5   S   0.8   R   X   -15"}, {"t0": 50.4, "t1": 57.3, "title": "ЛКМ по кінчику гілки. O, G Z — плавно підніми; зона колесом миші — лише на гілку", "keys": "ЛКМ   O   G   Z   0.35   Enter"}, {"t0": 57.3, "t1": 64.2, "title": "ЛКМ по кінчику гілки. O, G Z — плавно підніми; зона колесом миші — лише на гілку", "keys": "ЛКМ   O   G   Z   0.35   Enter"}, {"t0": 64.2, "t1": 69.9, "title": "Shift + A → Ico Sphere (стане частиною моделі). G — на гілку, S — більша", "keys": "Shift + A   G   S"}, {"t0": 69.9, "t1": 75.6, "title": "Shift + A → Ico Sphere (стане частиною моделі). G — на гілку, S — більша", "keys": "Shift + A   G   S"}, {"t0": 75.6, "t1": 82.5, "title": "Tab — готово! Покрути вид, щоб оглянути", "keys": "Tab"}]}, "man": {"label": "Чоловічок: Inset і Smooth", "steps": [{"t0": 0.0, "t1": 3.9, "title": "Tab, A — тулуб", "keys": "Tab   A   S   X   0.6   S   Y   0.35   S   Z   0.8"}, {"t0": 3.9, "t1": 5.1, "title": "Ctrl + R поперек грудей — розріз посередині (для ніг)", "keys": "Ctrl + R   ЛКМ   ПКМ"}, {"t0": 5.1, "t1": 8.7, "title": "Ще Ctrl + R: горизонтальний розріз і підніми його до плечей", "keys": "Ctrl + R   ЛКМ   веди мишею   ЛКМ"}, {"t0": 8.7, "t1": 13.8, "title": "Шия: 3, Shift + ЛКМ — 2 верхні грані. I 0.22", "keys": "3   Shift + ЛКМ   I   0.22   Enter"}, {"t0": 13.8, "t1": 20.7, "title": "E 0.15 — шия, потім E, ПКМ, S — ширше під голову, E 0.6", "keys": "E   0.15   E   ПКМ   S   E   0.6"}, {"t0": 20.7, "t1": 25.8, "title": "Ноги: знизу Shift + ЛКМ 2 грані; I, ще раз I — окремо для кожної", "keys": "Shift + ЛКМ   I   I   0.06"}, {"t0": 25.8, "t1": 29.1, "title": "Видави ноги вниз", "keys": "E   1.5   Enter"}, {"t0": 29.1, "t1": 34.2, "title": "Руки: Shift + ЛКМ — верхні бічні грані; I, I — окремо", "keys": "Shift + ЛКМ   I   I   0.05"}, {"t0": 34.2, "t1": 41.4, "title": "Alt + E → Individual Faces 0.35 — плечі вбік. Тоді знизу Shift + ЛКМ — і E 1.3 униз", "keys": "Alt + E   0.35   Shift + ЛКМ   E   1.3"}, {"t0": 41.4, "t1": 46.5, "title": "A, ПКМ → Smooth Vertices — згладь гострі кути", "keys": "A   ПКМ   Smooth Vertices"}, {"t0": 46.5, "t1": 53.4, "title": "Tab — готово! Покрути вид, щоб оглянути", "keys": "Tab"}]}, "ship_p": {"label": "Космічний корабель", "steps": [{"t0": 0.0, "t1": 3.6, "title": "Корпус: Shift + A → Куб; Tab, A → S X 0.2 → G X -0.8 — задній торець", "keys": "Shift + A   Tab   A   S   X   0.2   G   X   -0.8"}, {"t0": 3.6, "t1": 4.2, "title": "Корпус: Ctrl + R, колесо — 2 петлі уздовж (зверху / знизу) → S Y — розвести до ±0.5", "keys": "Ctrl + R   колесо   S   Y"}, {"t0": 4.2, "t1": 49.2, "title": "Корпус: ЛКМ / Shift + ЛКМ по передніх гранях → E уздовж X кільцями; кожне кільце S Y / S Z, кути S Z — під переріз референсу; у середині верхні / нижні вершини кільця G X — як на референсі", "keys": "E   X   S   Y   S   Z"}, {"t0": 49.2, "t1": 53.7, "title": "Зад: Shift + ЛКМ по бічних смугах заднього торця → E назад → S Z — «вушка»", "keys": "Shift + ЛКМ   E   X   S   Z"}, {"t0": 53.7, "t1": 56.7, "title": "Крила: K (ніж) по боковій грані корпусу (x 9.53) — межа кореня крила (з обох боків)", "keys": "K   ЛКМ   ЛКМ   Enter"}, {"t0": 56.7, "t1": 59.7, "title": "Крила: Shift + ЛКМ по бічних гранях (обидва боки) → I — рамка", "keys": "Shift + ЛКМ   I"}, {"t0": 59.7, "t1": 66.9, "title": "Крила: Alt + E назовні → S X — кінець коротший → S Z / G Z — нижче й тонше (трапеція)", "keys": "Alt + E   S   X   S   Z   G   Z"}, {"t0": 66.9, "t1": 74.1, "title": "Гондоли: кінці крил → Alt + E трохи (стінка) → S X — на всю довжину гондоли → S Z / G Z — висота", "keys": "Alt + E   S   X   S   Z   G   Z"}, {"t0": 74.1, "t1": 80.1, "title": "Гондоли: Alt + E тричі — три смуги гондоли (вузька, широка, вузька)", "keys": "Alt + E   Alt + E   Alt + E"}, {"t0": 80.1, "t1": 87.0, "title": "Гондоли: верх середньої смуги (обидва боки) → E Z — гребінь → передні вершини гребеня G X назад — скіс", "keys": "E   Z   G   X"}, {"t0": 87.0, "t1": 91.8, "title": "Гондоли: задні грані середньої смуги → E назад → S Y вужче → нижні вершини G — скіс (гострий хвіст)", "keys": "E   X   S   Y   G"}, {"t0": 91.8, "t1": 99.0, "title": "Гондоли: зовнішні грані → E назовні → S X / S Z — накладка звужується", "keys": "E   S   X   S   Z"}, {"t0": 99.0, "t1": 102.0, "title": "Кабіни: K (ніж) по скосу корпусу — діагональ від краю рейки до кореня крила (з обох боків)", "keys": "K   ЛКМ   ЛКМ   Enter"}, {"t0": 102.0, "t1": 109.2, "title": "Кабіни: Shift + ЛКМ по цих гранях (обидва боки) → I → E — ящик кабіни → S / G під референс", "keys": "Shift + ЛКМ   I   E   S   G"}, {"t0": 109.2, "t1": 112.5, "title": "Кабіни: задні внутрішні вершини → G X вперед — скошена корма", "keys": "ЛКМ   Shift + ЛКМ   G   X"}, {"t0": 112.5, "t1": 116.1, "title": "Кабіни: верх → E — дах → S — вужчий (уздовж і впоперек)", "keys": "E   S"}, {"t0": 116.1, "t1": 119.4, "title": "Кабіни: передні верхні вершини → G униз — клин до носа", "keys": "ЛКМ   Shift + ЛКМ   G"}, {"t0": 119.4, "t1": 123.6, "title": "Кабіни: задні грані (обидва боки) → I → E вперед — порожниста корма (повітрозабірник)", "keys": "Shift + ЛКМ   I   E"}, {"t0": 123.6, "t1": 126.6, "title": "Жалюзі: K (ніж) по скосу ззаду — межі панелі: 2 лінії уздовж і 2 скошені торці (з обох боків)", "keys": "K   ЛКМ   ЛКМ   Enter"}, {"t0": 126.6, "t1": 127.2, "title": "Жалюзі: K (ніж) по панелях — по одній лінії на кожне ребро (7, віялом)", "keys": "K   ЛКМ   ЛКМ   Enter"}, {"t0": 127.2, "t1": 130.8, "title": "Жалюзі: Shift + ЛКМ по панелях → E Z 0.25 — підняти", "keys": "Shift + ЛКМ   E   Z   0.25"}, {"t0": 130.8, "t1": 134.4, "title": "Жалюзі: панелі → R Y — нахил: спереду нижче (як на референсі)", "keys": "R   Y"}, {"t0": 134.4, "t1": 137.7, "title": "Жалюзі: верх панелей → I — рамка → G Z вниз — середина нижче (рамка скошена всередину)", "keys": "I   G   Z"}, {"t0": 137.7, "t1": 138.6, "title": "Жалюзі: 2 (ребра) → лінії ножа всередині рамки → Ctrl + B — ребра жалюзі", "keys": "2   Shift + ЛКМ   Ctrl + B"}, {"t0": 138.6, "t1": 139.8, "title": "Жалюзі: щілини (широкі грані між ребрами) → E Z вниз", "keys": "ЛКМ   Shift + ЛКМ   E   Z"}, {"t0": 139.8, "t1": 142.8, "title": "Бік: K (ніж) по боковій грані заднього корпусу — прямокутник панелі (з обох боків)", "keys": "K"}, {"t0": 142.8, "t1": 146.4, "title": "Бік: Shift + ЛКМ по грані панелі (обидва боки) → E всередину — заглибина", "keys": "Shift + ЛКМ   E"}, {"t0": 146.4, "t1": 160.2, "title": "Рейки: K (ніж) уздовж верху й низу (y ±0.5 ззаду, ±0.6 у середині) → бічні смуги (рейки) → E Z назовні; у середині G Z ще трохи", "keys": "K   E   Z   G   Z"}, {"t0": 160.2, "t1": 164.7, "title": "Хребет: K (ніж) по верху заднього корпусу (y ±0.27, x −0.77 і 5.79) → середня грань → E Z → верх S X / G X — похилі торці", "keys": "K   E   Z   S   X"}, {"t0": 164.7, "t1": 171.6, "title": "Капот: K (ніж) поперек каналу зверху (x 6.02 і 10.29) → грані між лініями → E Z → S Y / S X — вужчий і коротший верх", "keys": "K   E   Z   S   Y   S   X"}, {"t0": 171.6, "t1": 172.2, "title": "Ніс: K (ніж) по торцю — 2 вертикальні лінії (y ±1.01): середина і щоки", "keys": "K   ЛКМ   ЛКМ   Enter"}, {"t0": 172.2, "t1": 175.8, "title": "Ніс: кутові вершини торця (4) → G X назад — скошені щоки", "keys": "ЛКМ   Shift + ЛКМ   G   X"}, {"t0": 175.8, "t1": 182.7, "title": "Ніс: щоки (обидва боки) → I → E всередину → S X 0 — рівне дно ніші", "keys": "Shift + ЛКМ   I   E   S   X   0"}, {"t0": 182.7, "t1": 188.4, "title": "Ніс: середня грань торця → I → G X назад — рамка", "keys": "I   G   X"}, {"t0": 188.4, "t1": 192.9, "title": "Ніс: E всередину → S — щілина звужується вглиб", "keys": "E   X   S"}, {"t0": 192.9, "t1": 195.9, "title": "Тунель: K (ніж) по задній стінці — горизонтальні лінії під планки і 2 вертикальні", "keys": "K   ЛКМ   ЛКМ   Enter"}, {"t0": 195.9, "t1": 199.5, "title": "Тунель: Shift + ЛКМ по смугах через одну (планки) → E вперед", "keys": "ЛКМ   Shift + ЛКМ   E   X"}, {"t0": 199.5, "t1": 206.4, "title": "Tab — готово! Покрути вид, щоб оглянути", "keys": "Tab"}]}};
+
+function makePlayer(el) {
+  const data = CH[el.dataset.name], steps = data.steps;
+  el.innerHTML = `
+    <div class="stage"><video src="video/${el.dataset.name}.mp4" preload="metadata" playsinline></video>
+      <div class="done"><button class="main next2">Далі ▶</button></div></div>
+    <div class="bar">
+      <button class="prev" title="Попередній крок (←)">◀ Крок</button>
+      <button class="main play" title="Пробіл">▶ Старт</button>
+      <button class="again" title="Ще раз (R)">↻ Ще раз</button>
+      <button class="next" title="Наступний крок (→)">Крок ▶</button>
+      <div class="now"></div>
+      <label>Швидкість <select class="speed"><option value="0.5">0.5×</option><option value="0.75">0.75×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option></select></label>
+      <label><input type="checkbox" class="stop"> зупинятися після кроку</label>
+    </div>
+    <div class="seek"><input type="range" min="0" max="1000" value="0" aria-label="Перемотка"></div>
+    <ol class="steps">${steps.map(s => `<li>${s.title}<b>${s.keys}</b></li>`).join("")}</ol>`;
+  const v = el.querySelector("video"), q = s => el.querySelector(s);
+  const items = [...el.querySelectorAll("ol.steps li")], seek = q(".seek input");
+  let cur = 0, stopAt = null, dragging = false;
+  const idxAt = t => { let i = 0; steps.forEach((s, k) => { if (t >= s.t0 - 0.01) i = k; }); return i; };
+
+  function show() {
+    items.forEach((li, k) => { li.classList.toggle("cur", k === cur); });
+    q(".now").innerHTML = `Крок ${cur + 1} з ${steps.length}<small>${steps[cur].title}</small>`;
+    q(".play").textContent = v.paused ? "▶ Грати" : "⏸ Пауза";
+  }
+  function playStep(i) {
+    cur = Math.max(0, Math.min(steps.length - 1, i));
+    el.classList.remove("paused-end");
+    v.currentTime = steps[cur].t0 + 0.01;
+    stopAt = q(".stop").checked ? steps[cur].t1 - 0.06 : null;
+    v.play(); show();
+  }
+  function tick() {
+    if (!v.paused && stopAt !== null && v.currentTime >= stopAt) {
+      v.pause(); v.currentTime = stopAt; items[cur].classList.add("seen");
+      el.classList.toggle("paused-end", cur < steps.length - 1); stopAt = null; show();
+    }
+    if (!v.paused) { const i = idxAt(v.currentTime); if (i !== cur) { items[cur].classList.add("seen"); cur = i; show(); } }
+    if (!dragging && v.duration) seek.value = Math.round(v.currentTime / v.duration * 1000);
+    requestAnimationFrame(tick);
+  }
+  q(".play").onclick = () => {
+    if (v.paused) {
+      if (el.classList.contains("paused-end") || v.ended) playStep(v.ended ? 0 : cur + 1);
+      else { stopAt = q(".stop").checked ? steps[cur].t1 - 0.06 : null; if (v.currentTime >= steps[cur].t1 - 0.07) playStep(cur + 1); else v.play(); }
+    } else v.pause();
+    show();
+  };
+  v.onclick = () => q(".play").click();
+  q(".next").onclick = q(".next2").onclick = () => playStep(cur + 1);
+  q(".prev").onclick = () => playStep(cur - 1);
+  q(".again").onclick = () => playStep(cur);
+  q(".speed").onchange = e => { v.playbackRate = +e.target.value; };
+  q(".stop").onchange = e => { stopAt = e.target.checked && !v.paused ? steps[cur].t1 - 0.06 : null; };
+  items.forEach((li, k) => li.onclick = () => playStep(k));
+  seek.oninput = () => { dragging = true; v.currentTime = seek.value / 1000 * (v.duration || 0); cur = idxAt(v.currentTime); el.classList.remove("paused-end"); show(); };
+  seek.onchange = () => { dragging = false; };
+  v.onpause = v.onplay = show;
+  v.onratechange = () => {};
+  el.tabIndex = 0;
+  el.addEventListener("keydown", e => {
+    if (e.key === " ") { e.preventDefault(); q(".play").click(); }
+    else if (e.key === "ArrowRight") { e.preventDefault(); playStep(cur + 1); }
+    else if (e.key === "ArrowLeft") { e.preventDefault(); playStep(cur - 1); }
+    else if (e.key === "r" || e.key === "R" || e.key === "к" || e.key === "К") playStep(cur);
+  });
+  el.addEventListener("click", () => { active = el; });
+  show(); requestAnimationFrame(tick);
+  return el;
+}
+const players = [...document.querySelectorAll(".player")].map(makePlayer);
+let active = players[0];
+document.querySelectorAll(".tasks").forEach(box => {
+  const tabs = [...box.querySelectorAll(".tabs button")];
+  tabs.forEach(t => t.onclick = () => {
+    tabs.forEach(x => x.classList.toggle("on", x === t));
+    box.querySelectorAll(".player").forEach(p => {
+      const show = p.dataset.name === t.dataset.t;
+      p.hidden = !show;
+      if (!show) p.querySelector("video").pause(); else active = p;
+    });
+  });
+});
+// клавіші — для програвача, з яким працювали останнім (якщо фокус не в самому програвачі)
+document.addEventListener("keydown", e => {
+  if (!active || active.contains(document.activeElement) || /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return;
+  if ([" ", "ArrowLeft", "ArrowRight", "r", "R", "к", "К"].includes(e.key)) {
+    e.preventDefault(); active.dispatchEvent(new KeyboardEvent("keydown", { key: e.key }));
+  }
+});
+</script>
+</body>
+</html>

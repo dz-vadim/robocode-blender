@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blender для Unity — уроки</title>
+<style>
+:root{--bg:#f7f6f2;--fg:#1f2227;--muted:#5b616c;--card:#fff;--line:#e2e0d8;--accent:#6b2fa3}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17191d;--fg:#e9e8e4;--muted:#a3a8b2;--card:#1f2228;--line:#31353d;--accent:#b88ae6}}
+:root[data-theme="dark"]{--bg:#17191d;--fg:#e9e8e4;--muted:#a3a8b2;--card:#1f2228;--line:#31353d;--accent:#b88ae6}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:1040px;margin:0 auto;padding:40px 16px 72px}
+h1{font-size:2rem;line-height:1.2;margin:0 0 6px}
+.sub{color:var(--muted);margin:0 0 28px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media (max-width:820px){.grid{grid-template-columns:1fr}}
+a.card{display:flex;flex-direction:column;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;color:var(--fg);text-decoration:none}
+a.card:hover{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent) inset}
+a.card img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;background:var(--line)}
+.num{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;font-weight:700;font-size:.95rem;margin-right:8px}
+.card h2{font-size:1.15rem;margin:0;display:flex;align-items:center}
+.card p{margin:0;color:var(--muted);font-size:.95rem}
+.box{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:28px 0 0}
+kbd{background:var(--line);border-radius:4px;padding:1px 6px;font-weight:600;font-size:.88em}
+footer{margin-top:36px;color:var(--muted);font-size:.85rem}
+</style>
+</head>
+<body>
+<main>
+<h1>Blender для Unity</h1>
+<p class="sub">Уроки 3D-моделювання курсу Robocode · Blender 5.2. Кожен урок — коротке пояснення інструментів і покрокові відео: дивись, зупиняй, повторюй у своєму Blender.</p>
+<div class="grid">
+  <a class="card" href="blender-04/index.html"><img src="blender-04/img/rocket.jpg" alt=""><h2><span class="num">4</span>Перші кроки</h2><p>Інтерфейс, переміщення, обертання, масштаб, витягування. Колона, стілець, монітор, торт, колесо, ракета.</p></a>
+  <a class="card" href="blender-05/index.html"><img src="blender-05/img/ship_p.jpg" alt=""><h2><span class="num">5</span>Більше інструментів</h2><p>Inset, Bevel, Knife, Proportional Editing. Гриб, арка, дерево, чоловічок і великий космічний корабель.</p></a>
+  <a class="card" href="blender-06/index.html"><img src="blender-06/img/robocat_p.jpg" alt=""><h2><span class="num">6</span>Модифікатори і референси</h2><p>Mirror, модифікатори, картинки-референси. Кіт-робот за кресленням спереду і збоку.</p></a>
+</div>
+<div class="box"><b>Як дивитися відео:</b> <kbd>Пробіл</kbd> — пауза, <kbd>←</kbd> / <kbd>→</kbd> — крок назад / вперед, швидкість 0.5–1.5×. Потрібно, щоб відео чекало після кожного кроку, — постав галочку «зупинятися після кроку». Корабель уроку 5 має ще й <a href="blender-05/ship.html">покрокову інструкцію з картинками</a>.</div>
+<footer>Robocode · курс «Unity 3D». Матеріали для учнів.</footer>
+</main>
+</body>
+</html>

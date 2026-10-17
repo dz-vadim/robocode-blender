@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blender: модифікатори і референси</title>
+<style>
+:root{--bg:#f7f6f2;--fg:#1f2227;--muted:#5b616c;--card:#fff;--line:#e2e0d8;--accent:#6b2fa3;--accent2:#3d8b4f;--warn:#a15c00;--code:#efede6;--yel:#ffc428}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17191d;--fg:#e9e8e4;--muted:#a3a8b2;--card:#1f2228;--line:#31353d;--accent:#b88ae6;--accent2:#7fd18f;--warn:#ffc266;--code:#262a31}}
+:root[data-theme="dark"]{--bg:#17191d;--fg:#e9e8e4;--muted:#a3a8b2;--card:#1f2228;--line:#31353d;--accent:#b88ae6;--accent2:#7fd18f;--warn:#ffc266;--code:#262a31}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:1040px;margin:0 auto;padding:32px 16px 72px}
+h1{font-size:1.9rem;line-height:1.25;margin:0 0 6px}
+h2{font-size:1.3rem;margin:44px 0 10px;display:flex;gap:10px;align-items:baseline}
+h2 .n{flex:none;display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--accent);color:#fff;font-size:1rem}
+p{margin:8px 0}
+.sub{color:var(--muted);margin:0 0 22px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:14px 0}
+.tip{border-left:4px solid var(--accent2)}
+.warn{border-left:4px solid var(--warn)}
+figure{margin:14px 0}
+figure img{width:100%;height:auto;border-radius:8px;border:1px solid var(--line);display:block}
+figcaption{color:var(--muted);font-size:.9rem;margin-top:6px}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:720px){.pair{grid-template-columns:1fr}}
+code,kbd{background:var(--code);padding:1px 6px;border-radius:4px;font-size:.88em;overflow-wrap:anywhere}
+kbd{border:1px solid var(--line);border-bottom-width:3px;font-weight:600;white-space:nowrap}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.95rem}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:600}
+.wrap{overflow-x:auto}
+ol li,ul li{margin:4px 0}
+details{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 16px;margin-top:40px}
+summary{cursor:pointer;font-weight:600}
+footer{margin-top:40px;color:var(--muted);font-size:.85rem}
+
+/* вкладки завдань */
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 0}
+.tabs button{display:flex;gap:10px;align-items:center;text-align:left;background:var(--card);color:var(--fg);border:2px solid var(--line);border-radius:10px;padding:6px;font:inherit;cursor:pointer;min-width:0}
+.tabs button img{width:64px;height:64px;border-radius:6px;flex:none}
+.tabs button span{min-width:0;font-weight:600;line-height:1.3}
+.tabs button.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent) inset}
+.lvl{display:block;font-size:.75rem;letter-spacing:.06em;color:#fff;background:#6b2fa3;border-radius:4px;padding:1px 6px;width:max-content;margin-bottom:3px}
+.lvl.easy{background:#3d8b4f}.lvl.medium{background:#b07a00}.lvl.hard{background:#b03a3a}
+@media (max-width:620px){.tabs button{flex-direction:column;text-align:center}.tabs button img{width:56px;height:56px}.lvl{margin:0 auto 3px}}
+.player[hidden]{display:none}
+.tabs.four{grid-template-columns:repeat(4,1fr)}
+.tabs button .num{flex:none;display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:var(--accent);color:#fff;font-weight:700}
+@media (max-width:620px){.tabs.four{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:620px){.player .done{padding:8px}.player .done button{font-size:.9rem;padding:6px 12px}}
+
+/* програвач */
+.player{background:#101217;border-radius:12px;overflow:hidden;margin:14px 0;border:1px solid #2a2e37;color:#e9e8e4}
+.player .stage{position:relative;background:#000}
+.player video{display:block;width:100%;height:auto;aspect-ratio:16/10;background:#000;cursor:pointer}
+.player .done{position:absolute;right:0;bottom:0;display:none;padding:14px}
+.player.paused-end .done{display:flex}
+.player .done button{font-size:1.05rem;padding:10px 22px}
+.player .bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 12px;border-top:1px solid #2a2e37}
+.player button{background:#262b35;color:#fff;border:1px solid #3a404c;border-radius:8px;padding:7px 12px;font:inherit;font-size:.95rem;cursor:pointer}
+.player button:hover{background:#323846}
+.player button.main{background:var(--yel);color:#1d1600;border-color:var(--yel);font-weight:700}
+.player .now{flex:1 1 260px;font-weight:600;min-width:0}
+.player .now small{display:block;color:#a3a8b2;font-weight:400}
+.player label{font-size:.9rem;color:#c8ccd4;display:flex;gap:6px;align-items:center}
+.player select{background:#262b35;color:#fff;border:1px solid #3a404c;border-radius:6px;padding:4px}
+.player input[type=range]{width:100%;accent-color:var(--yel);margin:0}
+.player .seek{padding:0 12px 6px}
+.player ol.steps{margin:0;padding:6px 12px 12px 12px;list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:6px;counter-reset:s}
+.player ol.steps li{margin:0;counter-increment:s;padding:6px 10px 6px 38px;position:relative;border-radius:8px;background:#1a1d24;cursor:pointer;font-size:.88rem;line-height:1.35}
+.player ol.steps li::before{content:counter(s);position:absolute;left:8px;top:6px;width:22px;height:22px;border-radius:50%;background:#3a404c;display:grid;place-items:center;font-size:.8rem;font-weight:700}
+.player ol.steps li.cur{background:#3a2f0c;outline:2px solid var(--yel)}
+.player ol.steps li.cur::before{background:var(--yel);color:#1d1600}
+.player ol.steps li.seen::before{background:#3d8b4f}
+.player ol.steps li b{color:var(--yel);font-weight:600;display:block;font-size:.82rem}
+</style>
+</head>
+<body>
+<main>
+<!--nav--><style>.lnav{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin:0 0 18px;font-size:.92rem}.lnav a{color:var(--fg);text-decoration:none;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 12px}.lnav a:hover{border-color:var(--accent)}.lnav .nums{display:flex;gap:6px}.lnav .nums a,.lnav .nums b{min-width:36px;text-align:center;padding:6px 10px}.lnav .nums b{background:var(--accent);color:#fff;border-radius:8px}.lnav .side{flex:1 1 200px}.lnav .side.r{text-align:right}.lnav.bottom{margin:40px 0 0}@media (max-width:620px){.lnav .side{flex-basis:100%;text-align:center}.lnav .nums{margin:0 auto}}</style><nav class="lnav" aria-label="Уроки Blender"><span class="side"><a href="../blender-05/index.html" title="більше інструментів">← Урок 5: більше інструментів</a></span><span class="nums"><a href="../blender-04/index.html" title="перші кроки">4</a><a href="../blender-05/index.html" title="більше інструментів">5</a><b>6</b></span><span class="side r"></span></nav><!--/nav-->
+<h1>Blender: модифікатори і референси</h1>
+<p class="sub">Unity 3D · урок 6 «Модифікатори у Blender. Додавання референсів» · Blender 5.2</p>
+
+<div class="box tip"><b>Як дивитися відео.</b> Відео грає без зупинок; <kbd>Пробіл</kbd> — пауза, <kbd>←</kbd> / <kbd>→</kbd> — крок назад / вперед, швидкість 0.5–1.5×. Хочеш, щоб воно чекало на тебе після кожного кроку, — постав галочку <b>«зупинятися після кроку»</b>.
+<kbd>←</kbd> / <kbd>→</kbd> — попередній / наступний крок, <kbd>R</kbd> — ще раз. Жовтим унизу — клавіші.</div>
+
+<h2><span class="n">1</span>Модифікатори</h2>
+<p><b>Модифікатор</b> — автоматична дія, яка змінює вигляд об'єкта, <b>не чіпаючи його геометрію</b>. Його можна вимкнути, прибрати або поміняти місцями з іншими — модель від цього не зламається.</p>
+<div class="player" data-name="mods"></div>
+<div class="wrap"><table>
+<tr><th>Де / що</th><th>Що робить</th></tr>
+<tr><td>Гайковий ключ у правій панелі → <b>Add Modifier</b></td><td>додати модифікатор (Generate → Subdivision Surface, Bevel, Screw, Skin, Mirror…; Deform → Simple Deform)</td></tr>
+<tr><td>Порядок у списку (стек)</td><td>модифікатори працюють <b>згори вниз</b>; поміняй порядок — зміниться результат</td></tr>
+<tr><td>Іконка монітора</td><td>тимчасово вимкнути модифікатор</td></tr>
+<tr><td><kbd>×</kbd></td><td>прибрати модифікатор</td></tr>
+<tr><td><kbd>˅</kbd> → <b>Apply</b> (лише в Object Mode, <kbd>Tab</kbd>)</td><td>застосувати: зміни стають справжньою геометрією, яку можна редагувати</td></tr>
+</table></div>
+
+<h2><span class="n">2</span>Симетрія: Mirror</h2>
+<p>Робимо лише <b>половину</b> моделі — друга половина повторює все сама.</p>
+<div class="player" data-name="mirror"></div>
+<div class="box tip"><b>Axis</b> — вісь, уздовж якої відрізали половину (у нас Y). <b>Clipping</b> — вершини на середині «прилипають» до площини дзеркала: половинки не розходяться і не залазять одна в одну.</div>
+<div class="box warn"><b>Дзеркальну половину не виділити</b> — так і має бути. Редагуй лише справжню.</div>
+
+<h2><span class="n">3</span>Референси і кіт-робот</h2>
+<p><b>Референс</b> — картинка, по якій моделюємо. Ставимо дві: спереду і збоку, робимо напівпрозорими й підганяємо кожне кільце моделі під контур.</p>
+<figure><img src="img/robocat_p.jpg" alt="Готовий кіт-робот" style="max-width:240px"><figcaption>Що вийде</figcaption></figure>
+<div class="box"><b>Референс:</b> <kbd>Numpad 3</kbd> / <kbd>Numpad 1</kbd> — вид збоку / спереду → <kbd>Shift</kbd>+<kbd>A</kbd> → <b>Image → Reference</b> → вибери картинку.
+У властивостях картинки (Object Data): <b>Opacity 0.3</b>, <b>Depth: Front</b>, <b>Show In: Only Axis Aligned</b> — картинку видно лише у видах <kbd>1</kbd> / <kbd>3</kbd>, і вона не заважає крутити модель.</div>
+<p>Увесь кіт — одне відео (52 кроки). Список кроків під відео — щоб перейти одразу до потрібного.</p>
+<div class="player" data-name="robocat_p"></div>
+</div>
+<div class="wrap"><table>
+<tr><th>Прийом</th><th>Як</th></tr>
+<tr><td>Кільце під референс</td><td><kbd>Alt</kbd>+<kbd>ЛКМ</kbd> по кільцю → <kbd>S</kbd> (або <kbd>S</kbd> <kbd>X</kbd> / <kbd>S</kbd> <kbd>Y</kbd>) → <kbd>G</kbd> — до контуру на картинці</td></tr>
+<tr><td>Кругле пласке кільце</td><td>грані → <kbd>I</kbd> → ПКМ → <b>LoopTools → Circle</b>, потім <b>Flatten</b> (додаток LoopTools: Edit → Preferences → Get Extensions)</td></tr>
+<tr><td>Кілька граней в одну</td><td><kbd>X</kbd> → <b>Dissolve Faces</b></td></tr>
+<tr><td>Пласка сторона</td><td>грані → <kbd>S</kbd> <kbd>Z</kbd> <kbd>0</kbd></td></tr>
+<tr><td>Пальці окремо</td><td><kbd>Alt</kbd>+<kbd>E</kbd> → <b>Extrude Individual Faces</b></td></tr>
+<tr><td>Розрізи</td><td><kbd>Ctrl</kbd>+<kbd>R</kbd> — петля; <kbd>K</kbd> — ніж (<kbd>ЛКМ</kbd> по точках, <kbd>Enter</kbd>)</td></tr>
+</table></div>
+<div class="box tip"><b>Не обов'язково точно як у відео.</b> Числа в підписах — підказка; головне, щоб кільця лягали на контур референсу. Тягни мишею і дивись на картинку.</div>
+<div class="box">Збережи: <kbd>Ctrl</kbd>+<kbd>S</kbd> → <code>robocat.blend</code>.</div>
+
+<details>
+<summary>Для вчителя: файли для презентації</summary>
+<p>Кожен крок окремим відео — <code>video/&lt;вправа&gt;-NN.mp4</code> (у Google Slides їх можна зупиняти): завантаж на Диск → <b>Вставити → Відео → Google Диск</b>.</p>
+<p>Усі вправи підряд: <a href="video/lesson06-all.mp4">lesson06-all.mp4</a>. Цілі вправи: <a href="video/mods.mp4">mods</a> · <a href="video/mirror.mp4">mirror</a> · <a href="video/robocat_p.mp4">robocat_p</a>.</p>
+<p>Кіт відтворює оригінал курсу <code>Gatzer.blend</code> людськими кроками (точність ≈ 77 % за <code>tools/score.py</code>, без самоперетинів і зайвих ліній — <code>tools/mesh_check.py</code>); готова модель — <code>blender/models/lesson06/robocat_p.blend</code>. Джерела: <code>blender/lesson06/robo_p.py</code>, журнал <code>EXPERIMENTS.md</code>.</p>
+</details>
+
+<footer>Robocode · Unity 3D · урок 6</footer>
+<!--nav--><nav class="lnav bottom" aria-label="Уроки Blender"><span class="side"><a href="../blender-05/index.html" title="більше інструментів">← Урок 5: більше інструментів</a></span><span class="nums"><a href="../blender-04/index.html" title="перші кроки">4</a><a href="../blender-05/index.html" title="більше інструментів">5</a><b>6</b></span><span class="side r"></span></nav><!--/nav-->
+</main>
+
+<script>
+const CH = {"mods": {"label": "Модифікатори", "steps": [{"t0": 0.0, "t1": 3.0, "title": "Гайковий ключ у правій панелі → Add Modifier → Generate → Subdivision Surface", "keys": "ЛКМ   Add Modifier   Subdivision Surface"}, {"t0": 3.0, "t1": 4.5, "title": "Levels Viewport = 2 — куб стає кулею. Геометрія не змінилась!", "keys": "Levels Viewport   2"}, {"t0": 4.5, "t1": 8.1, "title": "× праворуч — прибрати модифікатор. Bevel — скошені ребра", "keys": "×   Add Modifier   Bevel"}, {"t0": 8.1, "t1": 12.0, "title": "Screw — обертання навколо осі", "keys": "×   Add Modifier   Screw"}, {"t0": 12.0, "t1": 19.2, "title": "Стек: Skin, Bevel, Simple Deform (Bend) — працюють згори вниз", "keys": "Add Modifier   Skin   Bevel   Simple Deform"}, {"t0": 19.2, "t1": 22.2, "title": "Стрілкою ▲ підніми Simple Deform нагору — результат інший: порядок важливий", "keys": "ЛКМ   ▲"}, {"t0": 22.2, "t1": 26.4, "title": "Іконка монітора — тимчасово вимкнути модифікатор", "keys": "ЛКМ   монітор"}, {"t0": 26.4, "t1": 30.6, "title": "Object Mode, ˅ біля модифікатора → Apply — зміни стають справжньою геометрією", "keys": "Tab   ˅   Apply"}]}, "mirror": {"label": "Симетрія: Mirror", "steps": [{"t0": 0.0, "t1": 1.5, "title": "Tab, Ctrl + R — розріз посередині (уздовж Y)", "keys": "Tab   Ctrl + R   ЛКМ   ПКМ"}, {"t0": 1.5, "t1": 6.0, "title": "Рамкою виділи половину і X → Faces — видали її", "keys": "ЛКМ (рамка)   X   Faces"}, {"t0": 6.0, "t1": 10.2, "title": "Add Modifier → Generate → Mirror. Axis: X вимкни, Y увімкни; Clipping", "keys": "Add Modifier   Mirror   Axis Y   Clipping"}, {"t0": 10.2, "t1": 14.4, "title": "Редагуй лише справжню половину — друга повторює все сама", "keys": "ЛКМ   E   0.6   Enter"}, {"t0": 14.4, "t1": 18.0, "title": "I 0.15, E -0.3 — і з другого боку теж ніша", "keys": "I   0.15   E   -0.3"}, {"t0": 18.0, "t1": 22.5, "title": "Верхня грань: I, E — виріст по центру не розходиться (Clipping)", "keys": "ЛКМ   I   0.2   E   0.5"}, {"t0": 22.5, "t1": 29.4, "title": "Tab — готово! Покрути вид, щоб оглянути", "keys": "Tab"}]}, "robocat_p": {"label": "Кіт-робот", "steps": [{"t0": 0.0, "t1": 1.8, "title": "Numpad 3 — вид спереду. Shift + A → Image → Reference: картинка спереду", "keys": "Numpad 3   Shift + A   Image   Reference"}, {"t0": 1.8, "t1": 3.3, "title": "Numpad 1 — вид збоку. Ще один референс — збоку", "keys": "Numpad 1   Shift + A   Image   Reference"}, {"t0": 3.3, "t1": 7.5, "title": "Object Data Properties → Opacity 0.3, Depth: Front, Show In: Only Axis Aligned", "keys": "Opacity   0.3   Depth   Front   Only Axis Aligned"}, {"t0": 7.5, "t1": 12.3, "title": "Тулуб: Shift + A → Циліндр (Vertices 12) · R X 90 · G Z 2.2", "keys": "Shift + A   R   X   90"}, {"t0": 12.3, "t1": 14.1, "title": "Тулуб: Ctrl + R, колесо — 5 петель уздовж циліндра", "keys": "Ctrl + R   колесо"}, {"t0": 14.1, "t1": 20.4, "title": "Тулуб: виділи половину (y < 0) → X → вершини; Modifier → Mirror по Y (Clipping)", "keys": "X   Mirror"}, {"t0": 20.4, "t1": 39.3, "title": "Тулуб: Alt + ЛКМ по кожному кільцю → S / G під переріз референсу", "keys": "Alt + ЛКМ   S   G"}, {"t0": 39.3, "t1": 43.8, "title": "Тулуб: Shift + ЛКМ по нижніх гранях → S Z 0 — пласке дно (як на референсі)", "keys": "S   Z   0"}, {"t0": 43.8, "t1": 51.0, "title": "Тулуб: Shift + ЛКМ по верхніх гранях → S Z 0 — пласкій верх", "keys": "S   Z   0"}, {"t0": 51.0, "t1": 58.8, "title": "Рука: ЛКМ по торцю → I (вузька рамка — груди лишаються широкими)", "keys": "I"}, {"t0": 58.8, "t1": 76.8, "title": "Рука: E до плеча → LoopTools Circle → S менше (конус від грудей)", "keys": "E   Circle   S"}, {"t0": 76.8, "t1": 91.8, "title": "Рука: E трохи → S більше (комірець плеча)", "keys": "E   S"}, {"t0": 91.8, "t1": 105.3, "title": "Рука: E до зап'ястя (уся довжина) → S під референс", "keys": "E   S"}, {"t0": 105.3, "t1": 111.6, "title": "Рука: Ctrl + R, колесо — 3 петлі (плече, лікоть) → S / G кожної під референс", "keys": "Ctrl + R   колесо   S   G"}, {"t0": 111.6, "t1": 115.2, "title": "Живіт: Shift + ЛКМ по нижніх гранях грудей → X → Dissolve Faces (одна грань)", "keys": "X   Dissolve Faces"}, {"t0": 115.2, "t1": 120.6, "title": "Живіт: I (рамка)", "keys": "I"}, {"t0": 120.6, "t1": 123.9, "title": "Живіт: LoopTools → Circle → Flatten — пласке кругле кільце, S під референс", "keys": "LoopTools   Circle   Flatten   S"}, {"t0": 123.9, "t1": 131.7, "title": "Живіт / таз: E вниз → S X / S Y під референс", "keys": "E   S   X   S   Y"}, {"t0": 131.7, "t1": 138.0, "title": "Живіт / таз: E вниз → S X / S Y під референс", "keys": "E   S   X   S   Y"}, {"t0": 138.0, "t1": 144.3, "title": "Живіт / таз: E вниз → S X / S Y під референс", "keys": "E   S   X   S   Y"}, {"t0": 144.3, "t1": 150.6, "title": "Живіт / таз: E вниз → S X / S Y під референс", "keys": "E   S   X   S   Y"}, {"t0": 150.6, "t1": 160.2, "title": "Живіт / таз: E вниз → S X / S Y під референс", "keys": "E   S   X   S   Y"}, {"t0": 160.2, "t1": 163.5, "title": "Таз: K (ніж) по дну уздовж — вузька смужка між ногами", "keys": "K"}, {"t0": 163.5, "t1": 168.0, "title": "Нога: ЛКМ по грані дна таза під ногу → LoopTools Circle → Flatten — пласке кругле кільце", "keys": "LoopTools   Circle   Flatten"}, {"t0": 168.0, "t1": 175.2, "title": "Нога: R — кільце нахилити (дивиться вниз і вбік) → S / G", "keys": "R   S   G"}, {"t0": 175.2, "t1": 193.2, "title": "Нога: E → R — кільце рівне (стегно)", "keys": "E   R   S   G"}, {"t0": 193.2, "t1": 208.2, "title": "Нога: E до самої підлоги → S / G", "keys": "E   R   S   G"}, {"t0": 208.2, "t1": 236.1, "title": "Нога: Ctrl + R, колесо — петлі на коліні й гомілці → S / G кожної під референс", "keys": "Ctrl + R   колесо   S   G"}, {"t0": 236.1, "t1": 247.5, "title": "Шия: Shift + ЛКМ по верхніх гранях грудей → X → Dissolve Faces (одна грань) → I", "keys": "X   Dissolve Faces   I"}, {"t0": 247.5, "t1": 256.5, "title": "Шия: LoopTools → Circle → Flatten — пласке кругле кільце, S під референс", "keys": "LoopTools   Circle   Flatten   S"}, {"t0": 256.5, "t1": 268.5, "title": "Шия: E угору → S під референс", "keys": "E   S"}, {"t0": 268.5, "t1": 283.5, "title": "Голова: E — основа голови → S ширше (S X / S Y)", "keys": "E   S"}, {"t0": 283.5, "t1": 298.5, "title": "Голова: E угору одним блоком → S X / S Y під референс", "keys": "E   S"}, {"t0": 298.5, "t1": 308.1, "title": "Голова: Alt + Shift + ЛКМ по вертикальних петлях біля кутів → S Shift + Z (назовні) — голова як коробка", "keys": "Alt + Shift + ЛКМ   S   Shift + Z"}, {"t0": 308.1, "t1": 314.7, "title": "Голова: K (ніж) по верху — поперек голови і від нього назад уздовж (основа вуха)", "keys": "K   ЛКМ   ЛКМ   Enter"}, {"t0": 314.7, "t1": 320.1, "title": "Вухо: ЛКМ по основі вуха (верх голови ззаду, збоку) → I", "keys": "I"}, {"t0": 320.1, "t1": 335.1, "title": "Вухо: E угору → S / G під референс", "keys": "E   S   G"}, {"t0": 335.1, "t1": 350.1, "title": "Вухо: E → S (вужче) / G назад", "keys": "E   S   G"}, {"t0": 350.1, "t1": 363.6, "title": "Вухо: E — кінчик → S менше", "keys": "E   S   G"}, {"t0": 363.6, "t1": 380.1, "title": "Вухо: Shift + ЛКМ по передніх гранях вуха — 3 секції (уся трапеція) → I → E всередину (вдавлення)", "keys": "I   E"}, {"t0": 380.1, "t1": 396.6, "title": "Обличчя: ЛКМ / Shift + ЛКМ по передніх гранях голови → I → E всередину (екран)", "keys": "I   E"}, {"t0": 396.6, "t1": 410.1, "title": "Кисть: ЛКМ по торцю руки → E (зап'ястя) → S менше", "keys": "E   S"}, {"t0": 410.1, "t1": 423.6, "title": "Кисть: E ще трохи → S більше (початок долоні)", "keys": "E   S"}, {"t0": 423.6, "t1": 430.5, "title": "Кисть: K (ніж) по торцю — 1 горизонтальний розріз і 3 вертикальні (сітка під пальці)", "keys": "K"}, {"t0": 430.5, "t1": 444.6, "title": "Долоня: A по торцю (усі грані) → E — розрізи тягнуться уздовж долоні → S під референс", "keys": "E   S"}, {"t0": 444.6, "t1": 472.2, "title": "Пальці: Shift + ЛКМ по 3 верхніх гранях → Alt + E (окремо) → S / G кожного", "keys": "Alt + E   S   G"}, {"t0": 472.2, "t1": 498.3, "title": "Пальці: Alt + E ще раз — друга фаланга → S / G (тонший кінчик)", "keys": "Alt + E   S   G"}, {"t0": 498.3, "t1": 513.3, "title": "Великий палець: ЛКМ по нижній правій грані → E → S / G", "keys": "E   S   G"}, {"t0": 513.3, "t1": 531.6, "title": "Великий палець: E ще раз → S менше (кінчик)", "keys": "E   S   G"}, {"t0": 531.6, "t1": 534.9, "title": "Ступня: K (ніж) — дуга по передніх гранях низу ноги (висока посередині, нижча з боків)", "keys": "K"}, {"t0": 534.9, "t1": 550.5, "title": "Ступня: Shift + ЛКМ по гранях під дугою → E вперед (носок) → S / G під референс", "keys": "E   S   G"}, {"t0": 550.5, "t1": 557.4, "title": "Tab — готово! Покрути вид, щоб оглянути", "keys": "Tab"}]}};
+
+function makePlayer(el) {
+  const data = CH[el.dataset.name], steps = data.steps;
+  el.innerHTML = `
+    <div class="stage"><video src="video/${el.dataset.name}.mp4" preload="metadata" playsinline></video>
+      <div class="done"><button class="main next2">Далі ▶</button></div></div>
+    <div class="bar">
+      <button class="prev" title="Попередній крок (←)">◀ Крок</button>
+      <button class="main play" title="Пробіл">▶ Старт</button>
+      <button class="again" title="Ще раз (R)">↻ Ще раз</button>
+      <button class="next" title="Наступний крок (→)">Крок ▶</button>
+      <div class="now"></div>
+      <label>Швидкість <select class="speed"><option value="0.5">0.5×</option><option value="0.75">0.75×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option></select></label>
+      <label><input type="checkbox" class="stop"> зупинятися після кроку</label>
+    </div>
+    <div class="seek"><input type="range" min="0" max="1000" value="0" aria-label="Перемотка"></div>
+    <ol class="steps">${steps.map(s => `<li>${s.title}<b>${s.keys}</b></li>`).join("")}</ol>`;
+  const v = el.querySelector("video"), q = s => el.querySelector(s);
+  const items = [...el.querySelectorAll("ol.steps li")], seek = q(".seek input");
+  let cur = 0, stopAt = null, dragging = false;
+  const idxAt = t => { let i = 0; steps.forEach((s, k) => { if (t >= s.t0 - 0.01) i = k; }); return i; };
+
+  function show() {
+    items.forEach((li, k) => { li.classList.toggle("cur", k === cur); });
+    q(".now").innerHTML = `Крок ${cur + 1} з ${steps.length}<small>${steps[cur].title}</small>`;
+    q(".play").textContent = v.paused ? "▶ Грати" : "⏸ Пауза";
+  }
+  function playStep(i) {
+    cur = Math.max(0, Math.min(steps.length - 1, i));
+    el.classList.remove("paused-end");
+    v.currentTime = steps[cur].t0 + 0.01;
+    stopAt = q(".stop").checked ? steps[cur].t1 - 0.06 : null;
+    v.play(); show();
+  }
+  function tick() {
+    if (!v.paused && stopAt !== null && v.currentTime >= stopAt) {
+      v.pause(); v.currentTime = stopAt; items[cur].classList.add("seen");
+      el.classList.toggle("paused-end", cur < steps.length - 1); stopAt = null; show();
+    }
+    if (!v.paused) { const i = idxAt(v.currentTime); if (i !== cur) { items[cur].classList.add("seen"); cur = i; show(); } }
+    if (!dragging && v.duration) seek.value = Math.round(v.currentTime / v.duration * 1000);
+    requestAnimationFrame(tick);
+  }
+  q(".play").onclick = () => {
+    if (v.paused) {
+      if (el.classList.contains("paused-end") || v.ended) playStep(v.ended ? 0 : cur + 1);
+      else { stopAt = q(".stop").checked ? steps[cur].t1 - 0.06 : null; if (v.currentTime >= steps[cur].t1 - 0.07) playStep(cur + 1); else v.play(); }
+    } else v.pause();
+    show();
+  };
+  v.onclick = () => q(".play").click();
+  q(".next").onclick = q(".next2").onclick = () => playStep(cur + 1);
+  q(".prev").onclick = () => playStep(cur - 1);
+  q(".again").onclick = () => playStep(cur);
+  q(".speed").onchange = e => { v.playbackRate = +e.target.value; };
+  q(".stop").onchange = e => { stopAt = e.target.checked && !v.paused ? steps[cur].t1 - 0.06 : null; };
+  items.forEach((li, k) => li.onclick = () => playStep(k));
+  seek.oninput = () => { dragging = true; v.currentTime = seek.value / 1000 * (v.duration || 0); cur = idxAt(v.currentTime); el.classList.remove("paused-end"); show(); };
+  seek.onchange = () => { dragging = false; };
+  v.onpause = v.onplay = show;
+  v.onratechange = () => {};
+  el.tabIndex = 0;
+  el.addEventListener("keydown", e => {
+    if (e.key === " ") { e.preventDefault(); q(".play").click(); }
+    else if (e.key === "ArrowRight") { e.preventDefault(); playStep(cur + 1); }
+    else if (e.key === "ArrowLeft") { e.preventDefault(); playStep(cur - 1); }
+    else if (e.key === "r" || e.key === "R" || e.key === "к" || e.key === "К") playStep(cur);
+  });
+  el.addEventListener("click", () => { active = el; });
+  show(); requestAnimationFrame(tick);
+  return el;
+}
+const players = [...document.querySelectorAll(".player")].map(makePlayer);
+let active = players[0];
+document.querySelectorAll(".tasks").forEach(box => {
+  const tabs = [...box.querySelectorAll(".tabs button")];
+  tabs.forEach(t => t.onclick = () => {
+    tabs.forEach(x => x.classList.toggle("on", x === t));
+    box.querySelectorAll(".player").forEach(p => {
+      const show = p.dataset.name === t.dataset.t;
+      p.hidden = !show;
+      if (!show) p.querySelector("video").pause(); else active = p;
+    });
+  });
+});
+// клавіші — для програвача, з яким працювали останнім (якщо фокус не в самому програвачі)
+document.addEventListener("keydown", e => {
+  if (!active || active.contains(document.activeElement) || /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return;
+  if ([" ", "ArrowLeft", "ArrowRight", "r", "R", "к", "К"].includes(e.key)) {
+    e.preventDefault(); active.dispatchEvent(new KeyboardEvent("keydown", { key: e.key }));
+  }
+});
+</script>
+</body>
+</html>
