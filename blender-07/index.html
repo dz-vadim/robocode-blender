@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blender: матеріали і текстури</title>
+<style>
+:root{--bg:#f7f6f2;--fg:#1f2227;--muted:#5b616c;--card:#fff;--line:#e2e0d8;--accent:#6b2fa3;--accent2:#3d8b4f;--warn:#a15c00;--code:#efede6;--yel:#ffc428}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17191d;--fg:#e9e8e4;--muted:#a3a8b2;--card:#1f2228;--line:#31353d;--accent:#b88ae6;--accent2:#7fd18f;--warn:#ffc266;--code:#262a31}}
+:root[data-theme="dark"]{--bg:#17191d;--fg:#e9e8e4;--muted:#a3a8b2;--card:#1f2228;--line:#31353d;--accent:#b88ae6;--accent2:#7fd18f;--warn:#ffc266;--code:#262a31}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:1040px;margin:0 auto;padding:32px 16px 72px}
+h1{font-size:1.9rem;line-height:1.25;margin:0 0 6px}
+h2{font-size:1.3rem;margin:44px 0 10px;display:flex;gap:10px;align-items:baseline}
+h2 .n{flex:none;display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--accent);color:#fff;font-size:1rem}
+p{margin:8px 0}
+.sub{color:var(--muted);margin:0 0 22px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:14px 0}
+.tip{border-left:4px solid var(--accent2)}
+.warn{border-left:4px solid var(--warn)}
+figure{margin:14px 0}
+figure img{width:100%;height:auto;border-radius:8px;border:1px solid var(--line);display:block}
+figcaption{color:var(--muted);font-size:.9rem;margin-top:6px}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:720px){.pair{grid-template-columns:1fr}}
+code,kbd{background:var(--code);padding:1px 6px;border-radius:4px;font-size:.88em;overflow-wrap:anywhere}
+kbd{border:1px solid var(--line);border-bottom-width:3px;font-weight:600;white-space:nowrap}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.95rem}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:600}
+.wrap{overflow-x:auto}
+ol li,ul li{margin:4px 0}
+details{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 16px;margin-top:40px}
+summary{cursor:pointer;font-weight:600}
+footer{margin-top:40px;color:var(--muted);font-size:.85rem}
+
+/* вкладки завдань */
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 0}
+.tabs button{display:flex;gap:10px;align-items:center;text-align:left;background:var(--card);color:var(--fg);border:2px solid var(--line);border-radius:10px;padding:6px;font:inherit;cursor:pointer;min-width:0}
+.tabs button img{width:64px;height:64px;border-radius:6px;flex:none}
+.tabs button span{min-width:0;font-weight:600;line-height:1.3}
+.tabs button.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent) inset}
+.lvl{display:block;font-size:.75rem;letter-spacing:.06em;color:#fff;background:#6b2fa3;border-radius:4px;padding:1px 6px;width:max-content;margin-bottom:3px}
+.lvl.easy{background:#3d8b4f}.lvl.medium{background:#b07a00}.lvl.hard{background:#b03a3a}
+@media (max-width:620px){.tabs button{flex-direction:column;text-align:center}.tabs button img{width:56px;height:56px}.lvl{margin:0 auto 3px}}
+.player[hidden]{display:none}
+.tabs.four{grid-template-columns:repeat(4,1fr)}
+.tabs button .num{flex:none;display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:var(--accent);color:#fff;font-weight:700}
+@media (max-width:620px){.tabs.four{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:620px){.player .done{padding:8px}.player .done button{font-size:.9rem;padding:6px 12px}}
+
+/* програвач */
+.player{background:#101217;border-radius:12px;overflow:hidden;margin:14px 0;border:1px solid #2a2e37;color:#e9e8e4}
+.player .stage{position:relative;background:#000}
+.player video{display:block;width:100%;height:auto;aspect-ratio:16/10;background:#000;cursor:pointer}
+.player .done{position:absolute;right:0;bottom:0;display:none;padding:14px}
+.player.paused-end .done{display:flex}
+.player .done button{font-size:1.05rem;padding:10px 22px}
+.player .bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 12px;border-top:1px solid #2a2e37}
+.player button{background:#262b35;color:#fff;border:1px solid #3a404c;border-radius:8px;padding:7px 12px;font:inherit;font-size:.95rem;cursor:pointer}
+.player button:hover{background:#323846}
+.player button.main{background:var(--yel);color:#1d1600;border-color:var(--yel);font-weight:700}
+.player .now{flex:1 1 260px;font-weight:600;min-width:0}
+.player .now small{display:block;color:#a3a8b2;font-weight:400}
+.player label{font-size:.9rem;color:#c8ccd4;display:flex;gap:6px;align-items:center}
+.player select{background:#262b35;color:#fff;border:1px solid #3a404c;border-radius:6px;padding:4px}
+.player input[type=range]{width:100%;accent-color:var(--yel);margin:0}
+.player .seek{padding:0 12px 6px}
+.player ol.steps{margin:0;padding:6px 12px 12px 12px;list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:6px;counter-reset:s}
+.player ol.steps li{margin:0;counter-increment:s;padding:6px 10px 6px 38px;position:relative;border-radius:8px;background:#1a1d24;cursor:pointer;font-size:.88rem;line-height:1.35}
+.player ol.steps li::before{content:counter(s);position:absolute;left:8px;top:6px;width:22px;height:22px;border-radius:50%;background:#3a404c;display:grid;place-items:center;font-size:.8rem;font-weight:700}
+.player ol.steps li.cur{background:#3a2f0c;outline:2px solid var(--yel)}
+.player ol.steps li.cur::before{background:var(--yel);color:#1d1600}
+.player ol.steps li.seen::before{background:#3d8b4f}
+.player ol.steps li b{color:var(--yel);font-weight:600;display:block;font-size:.82rem}
+</style>
+</head>
+<body>
+<main>
+<!--nav--><style>.lnav{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin:0 0 18px;font-size:.92rem}.lnav a{color:var(--fg);text-decoration:none;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 12px}.lnav a:hover{border-color:var(--accent)}.lnav .nums{display:flex;gap:6px}.lnav .nums a,.lnav .nums b{min-width:36px;text-align:center;padding:6px 10px}.lnav .nums b{background:var(--accent);color:#fff;border-radius:8px}.lnav .side{flex:1 1 200px}.lnav .side.r{text-align:right}.lnav.bottom{margin:40px 0 0}@media (max-width:620px){.lnav .side{flex-basis:100%;text-align:center}.lnav .nums{margin:0 auto}}</style><nav class="lnav" aria-label="Уроки Blender"><span class="side"><a href="../blender-06/index.html" title="модифікатори і референси">← Урок 6: модифікатори і референси</a></span><span class="nums"><a href="../blender-04/index.html" title="перші кроки">4</a><a href="../blender-05/index.html" title="більше інструментів">5</a><a href="../blender-06/index.html" title="модифікатори і референси">6</a><b>7</b></span><span class="side r"></span></nav><!--/nav-->
+<h1>Blender: матеріали, UV-розгортка, текстура</h1>
+<p class="sub">Unity 3D · урок 7 «Текстури. UV-mapping. Матеріали» · Blender 5.2</p>
+
+<div class="box tip"><b>Як дивитися відео.</b> Відео грає без зупинок; <kbd>Пробіл</kbd> — пауза, <kbd>←</kbd> / <kbd>→</kbd> — крок назад / вперед, швидкість 0.5–1.5×. Хочеш, щоб воно чекало на тебе після кожного кроку, — постав галочку <b>«зупинятися після кроку»</b>.
+<kbd>R</kbd> — показати крок ще раз. Жовтим унизу — клавіші.</div>
+<p>Працюємо з <b>котом-роботом з уроку 6</b>: спершу даємо йому матеріали, потім розрізаємо швами й розгортаємо, а наприкінці малюємо текстуру прямо в Blender. Покроково з картинками — <a href="lesson7.html">інструкція уроку</a>.</p>
+
+<h2><span class="n">1</span>Матеріали</h2>
+<p><b>Матеріал</b> — з чого «зроблений» об'єкт: колір, блиск, метал чи пластик, чи світиться. Щоб бачити матеріал наживо — <b>Object Mode</b> і <b>Viewport Shading → Material Preview</b> (кулька вгорі праворуч або <kbd>Z</kbd>).</p>
+<figure><img src="img/mat.jpg" alt="Кіт з матеріалами" style="max-width:240px"><figcaption>Що вийде</figcaption></figure>
+<div class="player" data-name="mat"></div>
+<div class="wrap"><table>
+<tr><th>Параметр</th><th>Що робить</th></tr>
+<tr><td><b>Base Color</b></td><td>основний колір</td></tr>
+<tr><td><b>Metallic</b></td><td>металевий блиск (0 — пластик, 1 — метал) — для роботів</td></tr>
+<tr><td><b>Roughness</b></td><td>грубість: 0 — гладкий, як дзеркало, 1 — матовий</td></tr>
+<tr><td><b>Specular</b></td><td>сила відблиску (схоже на Metallic, але не те саме)</td></tr>
+<tr><td><b>Subsurface</b></td><td>світло проходить крізь напівпрозоре (шкіра, віск)</td></tr>
+<tr><td><b>Emission</b></td><td>об'єкт ніби світиться (Color + Strength)</td></tr>
+</table></div>
+<div class="box tip"><b>Кілька матеріалів на одній моделі:</b> <kbd>+</kbd> (новий слот) → <b>New</b> → <kbd>Tab</kbd> → виділи грані → <b>Assign</b>. Експериментуй: один кіт — різні кольори.</div>
+
+<h2><span class="n">2</span>Шви й UV-розгортка</h2>
+<p><b>UV-розгортка</b> — модель, «розрізана» і розкладена на площині, як викрійка. На неї потім лягає картинка-текстура. Вкладка <b>UV Editing</b>: праворуч модель, ліворуч розгортка.</p>
+<figure><img src="img/uv.jpg" alt="Кіт зі швами" style="max-width:240px"><figcaption>Шви — червоні лінії</figcaption></figure>
+<div class="player" data-name="uv"></div>
+<div class="wrap"><table>
+<tr><th>Дія</th><th>Як</th></tr>
+<tr><td>Шов</td><td>виділи ребра (<kbd>Alt</kbd>+<kbd>ЛКМ</kbd> — усе кільце) → <kbd>ПКМ</kbd> → <b>Mark Seam</b></td></tr>
+<tr><td>Прибрати шов</td><td><kbd>ПКМ</kbd> → <b>Clear Seam</b></td></tr>
+<tr><td>Розгорнути</td><td><kbd>A</kbd> → <kbd>U</kbd> → <b>Unwrap</b></td></tr>
+<tr><td>Щільніше розкласти шматки</td><td>у розгортці: <b>UV → Pack Islands</b></td></tr>
+<tr><td>Зберегти розгортку картинкою</td><td><b>UV → Export UV Layout</b> (для GIMP / Photoshop)</td></tr>
+</table></div>
+<div class="box tip"><b>Де різати?</b> Уяви, що модель — паперова фігурка: де треба розрізати, щоб розкласти її на столі? Руки й ноги — трубки: кільце там, де кріпляться, і одна лінія вздовж (з того боку, якого менше видно). Наш кіт — половина з Mirror, тож по середині вже розрізаний.</div>
+<div class="box warn"><b>Шматки не мають налазити один на одного</b> — інакше фарба з одного місця з'явиться в іншому. Налізли — додай шов і зроби <b>Unwrap</b> ще раз. Кисті й пальці — найскладніші, тут нормально пробувати кілька разів.</div>
+
+<h2><span class="n">3</span>Текстура в Blender</h2>
+<p>Малюємо прямо по моделі у вкладці <b>Texture Paint</b>. Перша текстура — проста: лише кольори.</p>
+<figure><img src="img/paint.jpg" alt="Розфарбований кіт" style="max-width:240px"><figcaption>Що вийде</figcaption></figure>
+<div class="player" data-name="paint"></div>
+<div class="wrap"><table>
+<tr><th>Що</th><th>Як</th></tr>
+<tr><td>Нова текстура</td><td><b>Texture Slots</b> → <kbd>+</kbd> → <b>Base Color</b> → ім'я, 1024 × 1024, колір → OK</td></tr>
+<tr><td>Колір і розмір пензля</td><td>кольоровий прямокутник угорі; розмір — <kbd>F</kbd> і рух мишею</td></tr>
+<tr><td>Фарбувати лише потрібне</td><td>кнопка-кубик <b>Paint Mask</b>; грані виділяй у <kbd>Tab</kbd> і повертайся в Texture Paint</td></tr>
+<tr><td>Залити все одним кольором</td><td>інструмент <b>Fill</b> зліва</td></tr>
+<tr><td>Зберегти малюнок</td><td>у розгортці: <b>Image → Save As</b> → <code>robocat.png</code></td></tr>
+</table></div>
+<div class="box warn"><b>Збережи картинку!</b> <kbd>Ctrl</kbd>+<kbd>S</kbd> зберігає модель, але <b>не</b> намальовану текстуру. Без <b>Image → Save As</b> малюнок зникне після закриття Blender.</div>
+
+<h2><span class="n">4</span>Домашнє завдання</h2>
+<div class="box">Зніми відео в повний зріст (себе або когось зі знайомих) під час простого руху — помах рукою чи інший жест. Воно знадобиться на уроці 8 «Анімація».</div>
+
+<details>
+<summary>Для вчителя: файли для презентації</summary>
+<p>Кожен крок окремим відео — <code>video/&lt;вправа&gt;-NN.mp4</code> (у Google Slides їх можна зупиняти): завантаж на Диск → <b>Вставити → Відео → Google Диск</b>.</p>
+<p>Усі вправи підряд: <a href="video/lesson07-all.mp4">lesson07-all.mp4</a>. Цілі вправи: <a href="video/mat.mp4">mat</a> · <a href="video/uv.mp4">uv</a> · <a href="video/paint.mp4">paint</a>.</p>
+<p>Модель — кіт з уроку 6 (<code>blender/models/lesson06/robocat_p.blend</code>); готові файли — <code>blender/models/lesson07/</code> (mat, uv, paint і <code>robocat.png</code>). Джерело кроків: <code>blender/lesson07/anim07.py</code>. У презентації курсу текстуру малюють у графічному редакторі за експортованою розгорткою (Export UV Layout) — це теж працює, у гайді показано варіант повністю в Blender.</p>
+</details>
+
+<footer>Robocode · Unity 3D · урок 7</footer>
+<!--nav--><nav class="lnav bottom" aria-label="Уроки Blender"><span class="side"><a href="../blender-06/index.html" title="модифікатори і референси">← Урок 6: модифікатори і референси</a></span><span class="nums"><a href="../blender-04/index.html" title="перші кроки">4</a><a href="../blender-05/index.html" title="більше інструментів">5</a><a href="../blender-06/index.html" title="модифікатори і референси">6</a><b>7</b></span><span class="side r"></span></nav><!--/nav-->
+</main>
+
+<script>
+const CH = {"mat": {"label": "Матеріали", "steps": [{"t0": 0.0, "t1": 1.2, "title": "Відкрий свого кота з уроку 6 (File → Open). Режим Object Mode", "keys": "Ctrl + O"}, {"t0": 1.2, "t1": 3.3, "title": "Viewport Shading → Material Preview (кулька вгорі праворуч) — бачимо матеріали наживо", "keys": "Z   Material Preview"}, {"t0": 3.3, "t1": 5.4, "title": "Properties → вкладка Material (червона кулька) → + New — новий матеріал", "keys": "Material Properties   New"}, {"t0": 5.4, "t1": 9.0, "title": "Base Color — основний колір: помаранчевий", "keys": "Base Color"}, {"t0": 9.0, "t1": 12.6, "title": "Metallic 0.8 — металевий блиск, як у робота", "keys": "Metallic   0.8"}, {"t0": 12.6, "t1": 16.2, "title": "Roughness 0.35 — гладкіший, чіткіші відблиски", "keys": "Roughness   0.35"}, {"t0": 16.2, "t1": 22.8, "title": "Emission — ніби світиться зсередини: Strength 2 … і назад 0", "keys": "Emission   Strength"}, {"t0": 22.8, "t1": 24.6, "title": "Другий матеріал: + (новий слот) → New → «Екран»: темний, Emission блакитний 0.6", "keys": "+   New"}, {"t0": 24.6, "t1": 29.1, "title": "Tab → 3 (грані) → виділи екран на обличчі → Assign — екран отримує другий матеріал", "keys": "Tab   3   ЛКМ   Assign"}, {"t0": 29.1, "t1": 36.0, "title": "Tab — готово! Покрути вид, щоб оглянути", "keys": "Tab"}]}, "uv": {"label": "Шви й UV-розгортка", "steps": [{"t0": 0.0, "t1": 2.1, "title": "Вкладка UV Editing: праворуч — модель, ліворуч — її розгортка (UV-карта)", "keys": "UV Editing"}, {"t0": 2.1, "t1": 5.1, "title": "A → U → Unwrap без швів: усе зім'ято в один шматок — так текстуру не намалюєш", "keys": "A   U   Unwrap"}, {"t0": 5.1, "t1": 8.1, "title": "Шов на плечі: Alt + ЛКМ по кільцю, де рука виходить з тулуба → ПКМ → Mark Seam", "keys": "Alt + ЛКМ   ПКМ   Mark Seam"}, {"t0": 8.1, "t1": 11.1, "title": "Шов уздовж руки знизу: ЛКМ по ребру → ПКМ → Mark Seam (дивимось знизу)", "keys": "ЛКМ   ПКМ   Mark Seam"}, {"t0": 11.1, "t1": 14.1, "title": "Шов на зап'ясті: Alt + ЛКМ по кільцю → ПКМ → Mark Seam", "keys": "Alt + ЛКМ   ПКМ   Mark Seam"}, {"t0": 14.1, "t1": 17.1, "title": "Шов на стегні: Alt + ЛКМ по кільцю вгорі ноги → ПКМ → Mark Seam (дивимось знизу)", "keys": "Alt + ЛКМ   ПКМ   Mark Seam"}, {"t0": 17.1, "t1": 20.1, "title": "Шов уздовж ноги ззаду: ЛКМ по ребру, Shift + ЛКМ по наступних → ПКМ → Mark Seam", "keys": "ЛКМ   Shift + ЛКМ   ПКМ   Mark Seam"}, {"t0": 20.1, "t1": 23.1, "title": "Шов на щиколотці: Alt + ЛКМ по кільцю над ступнею → ПКМ → Mark Seam — ступня окремим шматком", "keys": "Alt + ЛКМ   ПКМ   Mark Seam"}, {"t0": 23.1, "t1": 26.1, "title": "Шов на шиї: Alt + ЛКМ по кільцю між шиєю і головою → ПКМ → Mark Seam", "keys": "Alt + ЛКМ   ПКМ   Mark Seam"}, {"t0": 26.1, "t1": 29.1, "title": "A → U → Unwrap: тепер кіт розрізаний по швах — рівні шматки, як викрійка", "keys": "A   U   Unwrap"}, {"t0": 29.1, "t1": 30.9, "title": "Готово: червоні лінії — шви, ліворуч — розгортка. Збережи файл (Ctrl + S)", "keys": "Ctrl + S"}]}, "paint": {"label": "Текстура в Blender", "steps": [{"t0": 0.0, "t1": 1.8, "title": "Вкладка Texture Paint: малюємо прямо по моделі", "keys": "Texture Paint"}, {"t0": 1.8, "t1": 3.6, "title": "Texture Slots → + → Base Color: ім'я RoboCat, 1024 × 1024, колір помаранчевий → OK", "keys": "+   Base Color   OK"}, {"t0": 3.6, "t1": 4.8, "title": "Колір пензля — темний (клік по кольоровому прямокутнику вгорі)", "keys": "Color"}, {"t0": 4.8, "t1": 6.0, "title": "Маска граней: кнопка-кубик «Paint Mask» вгорі. Виділяти грані — у Tab (Edit Mode), потім знову Texture Paint", "keys": "Paint Mask   Tab"}, {"t0": 6.0, "t1": 12.3, "title": "Кисті: виділи грані кисті → фарбуй — фарба лягає лише на виділене", "keys": "Tab   ЛКМ   Tab   ЛКМ"}, {"t0": 12.3, "t1": 15.6, "title": "Ступні: виділи грані ступні → фарбуй", "keys": "Tab   ЛКМ   Tab   ЛКМ"}, {"t0": 15.6, "t1": 18.3, "title": "Таз: виділи грані таза (вийдуть «шорти») → фарбуй", "keys": "Tab   ЛКМ   Tab   ЛКМ"}, {"t0": 18.3, "t1": 21.0, "title": "Вуха: передні грані вух → фарбуй", "keys": "Tab   ЛКМ   Tab   ЛКМ"}, {"t0": 21.0, "t1": 22.8, "title": "Image → Save As → robocat.png — обов'язково! Інакше малюнок зникне після закриття", "keys": "Image   Save As"}, {"t0": 22.8, "t1": 29.7, "title": "Tab — готово! Покрути вид, щоб оглянути", "keys": "Tab"}]}};
+
+function makePlayer(el) {
+  const data = CH[el.dataset.name], steps = data.steps;
+  el.innerHTML = `
+    <div class="stage"><video src="video/${el.dataset.name}.mp4" preload="metadata" playsinline></video>
+      <div class="done"><button class="main next2">Далі ▶</button></div></div>
+    <div class="bar">
+      <button class="prev" title="Попередній крок (←)">◀ Крок</button>
+      <button class="main play" title="Пробіл">▶ Старт</button>
+      <button class="again" title="Ще раз (R)">↻ Ще раз</button>
+      <button class="next" title="Наступний крок (→)">Крок ▶</button>
+      <div class="now"></div>
+      <label>Швидкість <select class="speed"><option value="0.5">0.5×</option><option value="0.75">0.75×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option></select></label>
+      <label><input type="checkbox" class="stop"> зупинятися після кроку</label>
+    </div>
+    <div class="seek"><input type="range" min="0" max="1000" value="0" aria-label="Перемотка"></div>
+    <ol class="steps">${steps.map(s => `<li>${s.title}<b>${s.keys}</b></li>`).join("")}</ol>`;
+  const v = el.querySelector("video"), q = s => el.querySelector(s);
+  const items = [...el.querySelectorAll("ol.steps li")], seek = q(".seek input");
+  let cur = 0, stopAt = null, dragging = false;
+  const idxAt = t => { let i = 0; steps.forEach((s, k) => { if (t >= s.t0 - 0.01) i = k; }); return i; };
+
+  function show() {
+    items.forEach((li, k) => { li.classList.toggle("cur", k === cur); });
+    q(".now").innerHTML = `Крок ${cur + 1} з ${steps.length}<small>${steps[cur].title}</small>`;
+    q(".play").textContent = v.paused ? "▶ Грати" : "⏸ Пауза";
+  }
+  function playStep(i) {
+    cur = Math.max(0, Math.min(steps.length - 1, i));
+    el.classList.remove("paused-end");
+    v.currentTime = steps[cur].t0 + 0.01;
+    stopAt = q(".stop").checked ? steps[cur].t1 - 0.06 : null;
+    v.play(); show();
+  }
+  function tick() {
+    if (!v.paused && stopAt !== null && v.currentTime >= stopAt) {
+      v.pause(); v.currentTime = stopAt; items[cur].classList.add("seen");
+      el.classList.toggle("paused-end", cur < steps.length - 1); stopAt = null; show();
+    }
+    if (!v.paused) { const i = idxAt(v.currentTime); if (i !== cur) { items[cur].classList.add("seen"); cur = i; show(); } }
+    if (!dragging && v.duration) seek.value = Math.round(v.currentTime / v.duration * 1000);
+    requestAnimationFrame(tick);
+  }
+  q(".play").onclick = () => {
+    if (v.paused) {
+      if (el.classList.contains("paused-end") || v.ended) playStep(v.ended ? 0 : cur + 1);
+      else { stopAt = q(".stop").checked ? steps[cur].t1 - 0.06 : null; if (v.currentTime >= steps[cur].t1 - 0.07) playStep(cur + 1); else v.play(); }
+    } else v.pause();
+    show();
+  };
+  v.onclick = () => q(".play").click();
+  q(".next").onclick = q(".next2").onclick = () => playStep(cur + 1);
+  q(".prev").onclick = () => playStep(cur - 1);
+  q(".again").onclick = () => playStep(cur);
+  q(".speed").onchange = e => { v.playbackRate = +e.target.value; };
+  q(".stop").onchange = e => { stopAt = e.target.checked && !v.paused ? steps[cur].t1 - 0.06 : null; };
+  items.forEach((li, k) => li.onclick = () => playStep(k));
+  seek.oninput = () => { dragging = true; v.currentTime = seek.value / 1000 * (v.duration || 0); cur = idxAt(v.currentTime); el.classList.remove("paused-end"); show(); };
+  seek.onchange = () => { dragging = false; };
+  v.onpause = v.onplay = show;
+  v.onratechange = () => {};
+  el.tabIndex = 0;
+  el.addEventListener("keydown", e => {
+    if (e.key === " ") { e.preventDefault(); q(".play").click(); }
+    else if (e.key === "ArrowRight") { e.preventDefault(); playStep(cur + 1); }
+    else if (e.key === "ArrowLeft") { e.preventDefault(); playStep(cur - 1); }
+    else if (e.key === "r" || e.key === "R" || e.key === "к" || e.key === "К") playStep(cur);
+  });
+  el.addEventListener("click", () => { active = el; });
+  show(); requestAnimationFrame(tick);
+  return el;
+}
+const players = [...document.querySelectorAll(".player")].map(makePlayer);
+let active = players[0];
+document.querySelectorAll(".tasks").forEach(box => {
+  const tabs = [...box.querySelectorAll(".tabs button")];
+  tabs.forEach(t => t.onclick = () => {
+    tabs.forEach(x => x.classList.toggle("on", x === t));
+    box.querySelectorAll(".player").forEach(p => {
+      const show = p.dataset.name === t.dataset.t;
+      p.hidden = !show;
+      if (!show) p.querySelector("video").pause(); else active = p;
+    });
+  });
+});
+// клавіші — для програвача, з яким працювали останнім (якщо фокус не в самому програвачі)
+document.addEventListener("keydown", e => {
+  if (!active || active.contains(document.activeElement) || /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return;
+  if ([" ", "ArrowLeft", "ArrowRight", "r", "R", "к", "К"].includes(e.key)) {
+    e.preventDefault(); active.dispatchEvent(new KeyboardEvent("keydown", { key: e.key }));
+  }
+});
+</script>
+</body>
+</html>
